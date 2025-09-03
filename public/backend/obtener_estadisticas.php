@@ -3,45 +3,12 @@
 // Incluir configuración
 require_once __DIR__ . "/../backend/config.php";
 
-// Verificar sesión
-if (!isset($_SESSION["id_usuario"])) {
-    header("Location: ../../fronted/Registro_y_inicio_sesion/inicio_sesion.php");
-    exit();
-}
-
-$id_usuario = $_SESSION["id_usuario"];
-
 // Conexión a la base de datos
 $conexion = new mysqli($servidor, $usuario, $contrasena, $base_de_datos);
 if ($conexion->connect_error) {
     die("Error de conexión: " . $conexion->connect_error);
 }
 $conexion->set_charset("utf8");
-
-// -------------------------
-// Obtener datos del usuario
-// -------------------------
-$stmt = $conexion->prepare("SELECT nombre_usuario, email, es_admin FROM usuarios WHERE id = ?");
-$stmt->bind_param("i", $id_usuario);
-$stmt->execute();
-$result = $stmt->get_result();
-
-$nombre_usuario_actual = "";
-$email_usuario_actual = "";
-$rol_usuario = "";
-
-if ($result && $result->num_rows > 0) {
-    $row = $result->fetch_assoc();
-    $nombre_usuario_actual = $row["nombre_usuario"];
-    $email_usuario_actual = $row["email"];
-    $rol_usuario = $row["es_admin"] == 1 ? "Administrador" : "Usuario";
-} else {
-    // Usuario no existe, cerrar sesión
-    session_destroy();
-    header("Location: ../../fronted/Registro_y_inicio_sesion/inicio_sesion.php");
-    exit();
-}
-$stmt->close();
 
 // -------------------------
 // Obtener estadísticas
@@ -109,7 +76,6 @@ if ($result) {
         $ultimasPublicaciones[] = htmlspecialchars($row["titulo"], ENT_QUOTES, "UTF-8");
     }
 }
-
 
 $seccion = isset($_GET['seccion']) ? $_GET['seccion'] : "inicio";
 

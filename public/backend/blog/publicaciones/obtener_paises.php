@@ -1,17 +1,4 @@
 <?php
-// Iniciar sesión si no está iniciada aún
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// Manejar cierre de sesión
-if (isset($_GET['action']) && $_GET['action'] === 'logout') {
-    session_destroy();
-    // Redirigir al mismo script sin parámetros
-    header("Location: " . strtok($_SERVER["REQUEST_URI"], '?'));
-    exit;
-}
-
 // Configuración y conexión a la base de datos
 require_once __DIR__ . '/../../config.php';
 
@@ -29,19 +16,6 @@ if ($res) {
         $paises[] = $row['nombre'];
     }
     $res->free();
-}
-
-// Verificar si usuario está logueado y obtener su pais_id
-$paisUsuarioId = null;
-if (isset($_SESSION['id_usuario']) && !empty($_SESSION['id_usuario'])) {
-    $stmt = $conexion->prepare("SELECT pais_id FROM usuarios WHERE id = ?");
-    $stmt->bind_param("i", $_SESSION['id_usuario']);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($usuarioDatos = $result->fetch_assoc()) {
-        $paisUsuarioId = $usuarioDatos['pais_id'] ?? null;
-    }
-    $stmt->close();
 }
 
 // Cerrar la conexión
