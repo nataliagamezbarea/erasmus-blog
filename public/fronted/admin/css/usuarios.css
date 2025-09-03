@@ -1,0 +1,11 @@
+.table thead {
+  background: linear-gradient(135deg, #a50dfd, #66b2ff);
+  color: white;
+}
+
+.table tbody tr,
+.table tbody td:not(.btn),
+.table tbody th:not(.btn),
+.table tbody a:not(.btn) {
+  color: black !important;
+}

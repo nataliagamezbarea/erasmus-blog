@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  web:
+    build: ./php
+    ports:
+      - "8080:80"
+    volumes:
+      - ./public:/var/www/html
+      - ./php/msmtprc:/etc/msmtprc:ro
+      - ./public/backend/imagenes_erasmus:/var/www/html/backend/imagenes_erasmus
+    depends_on:
+      - db
+      - mailhog
+    command: >
+      bash -c "
+        mkdir -p /var/www/html/backend/imagenes_erasmus &&
+        chown -R www-data:www-data /var/www/html/backend/imagenes_erasmus &&
+        chmod -R 775 /var/www/html/backend/imagenes_erasmus &&
+        apache2-foreground
+      "
+
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 123
+      MYSQL_DATABASE: erasmus
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./base_de_datos:/docker-entrypoint-initdb.d:ro
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: 123
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+volumes:
+  db_data:
